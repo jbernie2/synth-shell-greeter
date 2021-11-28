@@ -81,7 +81,12 @@ esac
 
 ## DEFINE LOCAL VARIABLES
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )
-INPUT_SCRIPT="$DIR/synth-shell-greeter/synth-shell-greeter.sh"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  INPUT_SCRIPT="$DIR/synth-shell-greeter/osx/synth-shell-greeter.sh"
+else
+  INPUT_SCRIPT="$DIR/synth-shell-greeter/linux/synth-shell-greeter.sh"
+fi
+
 INPUT_CONFIG_DIR="$DIR/config"
 
 
