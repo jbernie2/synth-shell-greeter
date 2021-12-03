@@ -307,33 +307,28 @@ printMonitorSwap()
 {
 	assert_is_set $bar_swap_units
 	assert_is_set $bar_swap_crit_percent
-
 	local format=$1
 	local label="Swap"
-
 	case "$bar_swap_units" in
-		"MB")		local units="MB"; local option="--mega" ;;
-		"TB")		local units="TB"; local option="--tera" ;;
-		"PB")		local units="PB"; local option="--peta" ;;
-		*)		local units="GB"; local option="--giga" ;;
+		"MB")		local units="MB"; local units_divisor=1 ;;
+		"TB")		local units="TB"; local units_divisor=1000000;;
+		"PB")		local units="PB"; local units_divisor=1000000000 ;;
+		*)		local units="GB"; local units_divisor=1000 ;;
 	esac
 
-	## CHECK IF SYSTEM HAS SWAP
-	## Count number of lines in /proc/swaps, excluding the header (-1)
-	## This is not fool-proof, but if num_swap_devs>=1, there should be swap
-	local num_swap_devs=$(($(wc -l /proc/swaps | awk '{print $1;}') -1))
+  local max_swap=$(sysctl vm.swapusage |\
+    sed 's/M//g;s/\.[0-9][0-9]//g' |\
+    awk '{print $4}'
+  )
+  local used_swap=$(sysctl vm.swapusage |\
+    sed 's/M//g;s/\.[0-9][0-9]//g' |\
+    awk '{print $7}'
+  )
+  local max=$((max_swap/units_divisor))
+  local current_value=$((used_swap/units_divisor))
+	local crit_percent=$bar_swap_crit_percent
 
-	if [ "$num_swap_devs" -lt 1 ]; then
-		printInfoLine "$label" "N/A"
-
-	else
-		local swap_info=$('free' "$option" | tail -n 1)
-		local current_value=$(echo "$swap_info" | awk '{SWAP=($3)} END {printf SWAP}')
-		local max=$(echo "$swap_info" | awk '{SWAP=($2)} END {printf SWAP}')
-		local crit_percent=$bar_swap_crit_percent
-
-		printResourceMonitor "$label" "$current_value" "$max" "$units" "$format" "$crit_percent"
-	fi
+  printResourceMonitor "$label" "$current_value" "$max" "$units" "$format" "$crit_percent"
 }
 
 
