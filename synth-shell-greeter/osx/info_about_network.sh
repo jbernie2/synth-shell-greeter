@@ -146,46 +146,7 @@ getExternalIPv6()
 ##
 getLocalIPv4()
 {
-	## GREP REGEX EXPRESSION TO RETRIEVE IP STRINGS
-	##
-	## The following string is intuitive and easy to read, but only parses
-	## strings that look like IPs, without checking their value. For instance,
-	## it does NOT check whether the IP bytes are [0-255], rather it
-	## accepts values from [0-999] as valid.
-	##
-	## grep explanation:
-	## -oP				only return matching parts of a line, and use perl regex
-	## \s*inet\s+			any-spaces "inet6" at-least-1-space
-	## (addr:?\s*)?			optionally, followed by addr or addr:
-	## \K				everything until here, omit
-	## (){4}			repeat block at least 1 time, up to 8
-	## ([0-9]){1,4}:*		1 to 3 integers [0-9] followed by "."
-	##
-	#local grep_reggex='^\s*inet\s+(addr:?\s*)?\K(([0-9]){1,3}\.*){4}'
-	##
-	## The following string, on the other hand, is harder to read and
-	## understand, but is MUCH safer, as it ensure that the IP
-	## fulfills some criteria.
-	local grep_reggex='^\s*inet\s+(addr:?\s*)?\K(((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))'
-
-
-	if   ( which ip > /dev/null 2>&1 ); then
-		local ip=$('ip' -family inet addr show |\
-		           grep -oP "$grep_reggex" |\
-		           sed '/127.0.0.1/d;:a;N;$!ba;s/\n/, /g')
-
-	elif ( which ifconfig > /dev/null 2>&1 ); then
-		local ip=$('ifconfig' |\
-		           grep -oP "$grep_reggex"|\
-		           sed '/127.0.0.1/d;:a;N;$!ba;s/\n/, /g')
-	else
-		local ip="N/A"
-	fi
-
-
-	## FIX IP FORMAT AND RETURN
-	## Add extra space after commas for readibility
-	local ip=$(echo "$ip" | sed 's/,/, /g')
+  local ip=$(ipconfig getifaddr en1 || ipconfig getifaddr en0)
 	printf "$ip"
 }
 
