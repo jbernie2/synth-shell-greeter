@@ -135,7 +135,11 @@ CONFIG_FILE="$OUTPUT_CONFIG_DIR/synth-shell-greeter.config"
 if [ -f "$CONFIG_FILE" ]; then
 	CONFIG_FILE="${CONFIG_FILE}.new"
 fi
-DISTRO=$(cat /etc/os-release | grep "ID=" | sed 's/ID=//g' | head -n 1)		
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  DISTRO=$OSTYPE
+else
+  DISTRO=$(cat /etc/os-release | grep "ID=" | sed 's/ID=//g' | head -n 1)		
+fi
 case "$DISTRO" in
 	'arch' )	cp "$INPUT_CONFIG_DIR/os/synth-shell-greeter.archlinux.config" "$CONFIG_FILE" ;;
 	'manjaro' )	cp "$INPUT_CONFIG_DIR/os/synth-shell-greeter.manjaro.config" "$CONFIG_FILE" ;;
