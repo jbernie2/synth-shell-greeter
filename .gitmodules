@@ -1,3 +1,4 @@
 [submodule "bash-tools"]
-	path = bash-tools
-	url = https://github.com/andresgongora/bash-tools.git
+  path = bash-tools
+  url = https://github.com/jbernie2/bash-tools.git
+  branch = .
