@@ -53,6 +53,11 @@ elif [ "$#" -eq 2 ]; then
 	OUTPUT_SCRIPT="$1"
 	OUTPUT_CONFIG_DIR="$2"
 	USER_CHOICE="y"
+
+elif [ "$#" -eq 3 ]; then
+	OUTPUT_SCRIPT="$1"
+	OUTPUT_CONFIG_DIR="$2"
+	USER_CHOICE="$3"
 	
 else
 	printError "Wrong number of arguments passed to setup script"
